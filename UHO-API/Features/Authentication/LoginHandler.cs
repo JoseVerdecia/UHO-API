@@ -23,9 +23,10 @@ public class LoginHandler : IRequestHandler<LoginRequest, AuthenticationResponse
     public async Task<Result<AuthenticationResponse>> Handle(LoginRequest request, CancellationToken cancellationToken)
     {
         var user = await _userManager.FindByEmailAsync(request.Email);
+        
         if (user is null || !await _userManager.CheckPasswordAsync(user, request.Password))
         {
-            return Error.Validation("Invalid email or password.");
+            return Error.Validation("Email o contraseña invalidos.");
         }
 
         // Generar tokens

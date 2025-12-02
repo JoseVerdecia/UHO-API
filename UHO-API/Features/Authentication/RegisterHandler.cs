@@ -47,14 +47,17 @@ public class RegisterHandler : IRequestHandler<RegisterRequest, AuthenticationRe
             UserName = request.Email,
             FullName = request.FullName
         };
-
+        
         var identityResult = await _userManager.CreateAsync(user, request.Password);
 
+        
         if (!identityResult.Succeeded)
         {
             var errors = string.Join(", ", identityResult.Errors.Select(e => e.Description));
             return Error.Validation(errors);
         }
+        
+        await _userManager.AddToRoleAsync(user, Roles.UsuarioNormal);
         
         // Generar tokens
         var roles = await _userManager.GetRolesAsync(user);

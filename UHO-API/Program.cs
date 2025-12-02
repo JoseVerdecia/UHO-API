@@ -3,6 +3,7 @@ using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Scalar.AspNetCore;
@@ -16,6 +17,9 @@ using UHO_API.Features.Area.Query;
 using UHO_API.Features.Area.Validations;
 using UHO_API.Features.Authentication;
 using UHO_API.Features.Authentication.Validations;
+using UHO_API.Features.Users;
+using UHO_API.Features.Users.Queries;
+using UHO_API.Features.Users.Validations;
 using UHO_API.Infraestructure.Repository;
 using UHO_API.Infraestructure.SD;
 using UHO_API.Infraestructure.Services;
@@ -41,6 +45,7 @@ var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSetting
 
 builder.Services.AddValidatorsFromAssemblyContaining<RegisterRequestValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<AreaModelValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<DegradeUserValidator>();
 
 
 builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
@@ -69,23 +74,35 @@ builder.Services.AddAuthentication(options =>
 });
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseInMemoryDatabase("AuthDb"));
+{
+    options.UseInMemoryDatabase("AuthDb");
+    options.ConfigureWarnings(w => w.Ignore(InMemoryEventId.TransactionIgnoredWarning));
+});
 
 // --- 4. Mediator y Handlers ---
 //builder.Services.AddMediatorHandlersConfiguration();
 
 builder.Services.AddSingleton<IMediator, Mediator>();
+
+// Auth
 builder.Services.AddScoped<IRequestHandler<RegisterRequest, AuthenticationResponse>, RegisterHandler>();
 builder.Services.AddScoped<IRequestHandler<LoginRequest, AuthenticationResponse>, LoginHandler>();
 builder.Services.AddScoped<IRequestHandler<RefreshTokenRequest, AuthenticationResponse>, RefreshTokenHandler>();
 
+// Areas
 builder.Services.AddScoped<IRequestHandler<GetAllAreaQuery, IEnumerable<AreaResponse>>, GetAllAreaHandler>();
 builder.Services.AddScoped<IRequestHandler<GetAreaByIdQuery, AreaResponse>, GetAreaByIdHandler>();
 builder.Services.AddScoped<IRequestHandler<CreateAreaCommand, AreaResponse>, CreateAreaHandler>();
 builder.Services.AddScoped<IRequestHandler<UpdateAreaCommand, AreaResponse>, UpdateAreaHandler>();
 builder.Services.AddScoped<IRequestHandler<SoftDeleteAreaCommand, bool>, SoftDeleteAreaHandler>();
 builder.Services.AddScoped<IRequestHandler<HardDeleteCommand, bool>, HardDeleteHandler>();
-
+// User
+builder.Services.AddScoped<IRequestHandler<GetUserQuery, ApplicationUser>, GetUserQueryHandler>();
+builder.Services.AddScoped<IRequestHandler<GetAllUsersQuery, IEnumerable<ApplicationUser>>, GetAllUserQueryHandler>();
+builder.Services.AddScoped<IRequestHandler<GetAllJefeAreasQuery, IEnumerable<ApplicationUser>>, GetAllJefeAreasQueryHandler>();
+builder.Services.AddScoped<IRequestHandler<GetAllUsuariosNormalQuery, IEnumerable<ApplicationUser>>, GetAllUsuariosNormalQueryHandler>();
+builder.Services.AddScoped<IRequestHandler<GetAllJefeProcesos, IEnumerable<ApplicationUser>>, GetAllJefeProcesosQueryHandler>();
+builder.Services.AddScoped<IRequestHandler<DegradeUserToUsuarioNormalCommand, ApplicationUser>, DegradeUserToUsuarioNormalHandler>();
 
 builder.Services.AddScoped<IUnitOfWorks, UnitOfWorks>();
 builder.Services.AddScoped<IRoleChangesService, RoleChangesService>();
@@ -110,6 +127,7 @@ app.UseHttpsRedirection();
 
 app.MapAuthenticationEndpoints();
 app.MapAreaEndpoints();
+app.MapUserEndpoints();
 
 
 using (var scope = app.Services.CreateScope())

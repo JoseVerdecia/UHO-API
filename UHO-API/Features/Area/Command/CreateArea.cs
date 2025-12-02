@@ -14,11 +14,13 @@ public class CreateAreaHandler : IRequestHandler<CreateAreaCommand, AreaResponse
 {
     private readonly IUnitOfWorks _uow;
     private readonly UserManager<ApplicationUser> _userManager;
+    private readonly IRoleChangesService _roleChangesService;
 
-    public CreateAreaHandler(IUnitOfWorks uow, UserManager<ApplicationUser> userManager)
+    public CreateAreaHandler(IUnitOfWorks uow, UserManager<ApplicationUser> userManager, IRoleChangesService roleChangesService)
     {
         _uow = uow;
         _userManager = userManager;
+        _roleChangesService = roleChangesService;
     }
 
     public async Task<Result<AreaResponse>> Handle(CreateAreaCommand request, CancellationToken cancellationToken)
@@ -40,6 +42,7 @@ public class CreateAreaHandler : IRequestHandler<CreateAreaCommand, AreaResponse
         {
             newArea.JefeArea = jefeArea;
             newArea.JefeAreaId = jefeArea.Id;
+            await _roleChangesService.PromoteToJefeAreaAsync(jefeArea.Id);
         }
         
         _uow.Area.Add(newArea);
