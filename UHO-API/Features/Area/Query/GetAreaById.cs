@@ -19,18 +19,22 @@ public class GetAreaByIdHandler : IRequestHandler<GetAreaByIdQuery, AreaResponse
 
     public async Task<Result<AreaResponse>> Handle(GetAreaByIdQuery query, CancellationToken cancellationToken)
     {
-        // Obtenemos el área incluyendo al jefe de área
-        var area = await _uow.Area.Get(a => a.Id == query.Id, includeProperties: "JefeArea");
+        
+        var area = await _uow.Area.GetActiveById(query.Id,includeProperties:"JefeArea");
         
         if (area is null)
         {
-            return Error.NotFound("Área no encontrada.");
-        }
-        return new AreaResponse(
-            area.Id,
-            area.Nombre,
-            area.JefeAreaId ?? "No Asignado",
-            area.JefeArea?.FullName ?? "No Asignado"
+            return Result.Failure<AreaResponse>(
+                Error.NotFound("Area", query.Id.ToString())
             );
+        }
+        
+        return Result.Success(new AreaResponse(
+                area.Id,
+                area.Nombre,
+                area.JefeAreaId ?? "No Asignado",
+                area.JefeArea?.FullName ?? "No Asignado",
+                area.JefeArea?.Email ?? "N/A")
+        );
     }
 }

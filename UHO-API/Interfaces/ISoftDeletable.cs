@@ -1,7 +1,9 @@
-﻿namespace UHO_API.Interfaces;
+﻿using UHO_API.Infraestructure.Repository;
+
+namespace UHO_API.Interfaces;
 
 public interface ISoftDeletable
 {
-    public bool IsDeleted { get; set; }
-    public DateTime? DeletedAt { get; set; }
+     bool IsDeleted { get; set; }
+    DateTime? DeletedAt { get; set; }
 }

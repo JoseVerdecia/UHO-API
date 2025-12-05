@@ -6,7 +6,7 @@ using UHO_API.Interfaces.IRepository;
 
 namespace UHO_API.Infraestructure.Repository;
 
-public class Repository<T>:IRepository<T> where T:class,ISoftDeletable
+public class Repository<T>:IRepository<T> where T:class,IEntity,ISoftDeletable
 {
     private readonly ApplicationDbContext  _context;
     internal DbSet<T> dbSet;
@@ -22,7 +22,7 @@ public class Repository<T>:IRepository<T> where T:class,ISoftDeletable
         
         query = IncludeProperties(query,includeProperties);
       
-        return await query.AsNoTracking().ToListAsync();
+        return await query.ToListAsync();
     }
 
     public async Task<IEnumerable<T>> GetAllBy(Expression<Func<T, bool>> predicate, string includeProperties = null)
@@ -33,7 +33,7 @@ public class Repository<T>:IRepository<T> where T:class,ISoftDeletable
         
         query = IncludeProperties(query,includeProperties);
 
-        return await query.AsNoTracking().ToListAsync();
+        return await query.ToListAsync();
     }
 
     public async Task<T?> Get(Expression<Func<T, bool>> predicate, string includeProperties = null)
@@ -61,9 +61,55 @@ public class Repository<T>:IRepository<T> where T:class,ISoftDeletable
         {
             entity.IsDeleted = true;
             entity.DeletedAt = DateTime.UtcNow;
+            
+            if (entity is BaseEntity baseEntity)
+            {
+                baseEntity.UpdatedAt = DateTime.UtcNow;
+            }
+            
             Update(entity);
         }
     }
+    
+    public async Task Restore(int id)
+    {
+        var entity = await GetById(id);
+        if (entity != null && entity.IsDeleted)
+        {
+            entity.IsDeleted = false;
+            entity.DeletedAt = null;
+        
+            if (entity is BaseEntity baseEntity)
+            {
+                baseEntity.UpdatedAt = DateTime.UtcNow;
+            }
+        
+            Update(entity);
+        }
+    }
+    
+    
+    public async Task<T?> GetActiveById(int id,string includeProperties = null)
+    {
+        IQueryable<T> query = dbSet.Where(e => !e.IsDeleted);
+        query = IncludeProperties(query, includeProperties);
+        return await query.FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted);
+    }
+    
+    public async Task<IEnumerable<T>> GetActive(string includeProperties = null)
+    {
+        IQueryable<T> query = dbSet.Where(e => !e.IsDeleted);
+        query = IncludeProperties(query, includeProperties);
+        return await query.ToListAsync();
+    }
+    
+    public async Task<IEnumerable<T>> GetDeleted(string includeProperties = null)
+    {
+        IQueryable<T> query = dbSet.Where(e => e.IsDeleted);
+        query = IncludeProperties(query, includeProperties);
+        return await query.ToListAsync();
+    }
+
 
     public async Task<IEnumerable<T>> GetPaginatedAsync(int page, int pageSize)
     {

@@ -25,35 +25,80 @@ public class CreateAreaHandler : IRequestHandler<CreateAreaCommand, AreaResponse
 
     public async Task<Result<AreaResponse>> Handle(CreateAreaCommand request, CancellationToken cancellationToken)
     {
+        
+        if (string.IsNullOrWhiteSpace(request.Nombre))
+        {
+            return Result.Failure<AreaResponse>(
+                Error.Validation("Nombre", "El nombre del área es requerido")
+            );
+        }
+        
         var existingArea = await _uow.Area.Get(a => a.Nombre == request.Nombre);
         
         if (existingArea is not null)
         {
-            return Error.Validation("Ya existe un área con ese nombre.");
+            return Result.Failure<AreaResponse>(
+                Error.Conflict("Area", "Nombre", request.Nombre)
+            );
         }
 
-        ApplicationUser? jefeArea =await _userManager.FindByIdAsync(request.JefeAreaId);
-
-        AreaModel newArea = new AreaModel();
+        ApplicationUser? jefeArea = null;
         
-        newArea.Nombre = request.Nombre;
+        if (!string.IsNullOrWhiteSpace(request.JefeAreaId))
+        {
+            jefeArea = await _userManager.FindByIdAsync(request.JefeAreaId);
+            
+            if (jefeArea is null)
+            {
+                return Result.Failure<AreaResponse>(
+                    Error.NotFound("Usuario", request.JefeAreaId)
+                );
+            }
+        }
+        
+        AreaModel newArea = new()
+        {
+            Nombre = request.Nombre,
+            JefeAreaId = jefeArea?.Id,
+            CreatedAt = DateTime.UtcNow
+        };
         
         if (jefeArea is not null)
         {
             newArea.JefeArea = jefeArea;
-            newArea.JefeAreaId = jefeArea.Id;
-            await _roleChangesService.PromoteToJefeAreaAsync(jefeArea.Id);
+            
+            try
+            {
+                await _roleChangesService.PromoteToJefeAreaAsync(jefeArea.Id);
+            }
+            catch (Exception ex)
+            {
+                return Result.Failure<AreaResponse>(
+                    Error.Business("PromotionFailed", $"No se pudo promover al usuario: {ex.Message}")
+                );
+            }
         }
         
-        _uow.Area.Add(newArea);
-        await _uow.SaveChangesAsync();
+        try
+        {
+            _uow.Area.Add(newArea);
+            await _uow.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            return Result.Failure<AreaResponse>(
+                Error.Failure("DatabaseError", $"Error al guardar el área: {ex.Message}")
+            );
+        }
         
-        
-        return new AreaResponse(
+        var response = new AreaResponse(
             newArea.Id,
             newArea.Nombre,
             newArea.JefeAreaId ?? "No Asignado",
-            newArea.JefeArea?.FullName?? "No Asignado"
+            newArea.JefeArea?.FullName ?? "No Asignado",
+            newArea.JefeArea?.Email ?? "N/A"
         );
+      
+        return Result.Success(response);
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace UHO_API.Interfaces;
+﻿using UHO_API.Utilities;
+
+namespace UHO_API.Interfaces;
 
 public interface IRoleChangesService
 {
@@ -8,7 +10,7 @@ public interface IRoleChangesService
     /// </summary>
     /// <param name="userId">El ID del usuario a promover.</param>
     /// <returns>True si la operación fue exitosa, false en caso contrario.</returns>
-    Task<bool> PromoteToJefeAreaAsync(string userId);
+    Task<Result> PromoteToJefeAreaAsync(string userId);
 
     /// <summary>
     /// Promueve un usuario a Jefe de Proceso.
@@ -16,12 +18,12 @@ public interface IRoleChangesService
     /// </summary>
     /// <param name="userId">El ID del usuario a promover.</param>
     /// <returns>True si la operación fue exitosa, false en caso contrario.</returns>
-    Task<bool> PromoteToJefeProcesoAsync(string userId);
+    Task<Result> PromoteToJefeProcesoAsync(string userId);
 
     /// <summary>
     /// Degrada a un usuario (Jefe de Área o Jefe de Proceso) a Usuario Normal.
     /// </summary>
     /// <param name="userId">El ID del usuario a degradar.</param>
     /// <returns>True si la operación fue exitosa, false en caso contrario.</returns>
-    Task<bool> DemoteToUsuarioNormalAsync(string userId);
+    Task<Result> DemoteToUsuarioNormalAsync(string userId);
 }

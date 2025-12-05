@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using UHO_API.Data;
 using UHO_API.Infraestructure.SD;
 using UHO_API.Interfaces.IRepository;
@@ -29,5 +30,28 @@ public class AreaRepository:Repository<AreaModel>,IAreaRepository
         
         return responsable;
 
+    }
+
+    public async Task<AreaModel?> GetActiveByIdAsync(int id)
+    {
+        return await _context.Areas
+            .Include(a => a.JefeArea)
+            .FirstOrDefaultAsync(a => a.Id == id && !a.IsDeleted);
+    }
+
+    public async Task<IEnumerable<AreaModel>> GetActiveAreasAsync()
+    {
+        return await _context.Areas
+            .Include(a => a.JefeArea)
+            .Where(a => !a.IsDeleted)
+            .ToListAsync();
+    }
+
+    public async Task<IEnumerable<AreaModel>> GetDeletedAreasAsync()
+    {
+        return await _context.Areas
+            .Include(a => a.JefeArea)
+            .Where(a => a.IsDeleted)
+            .ToListAsync();
     }
 }

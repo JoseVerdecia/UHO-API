@@ -33,16 +33,16 @@ public class RefreshTokenHandler : IRequestHandler<RefreshTokenRequest, Authenti
         var principal = GetPrincipalFromExpiredToken(request.AccessToken);
         if (principal is null)
         {
-            return Error.Failure("Invalid access token.");
+            return Result.Failure<AuthenticationResponse>(Error.Failure("Auth.Failure","Invalid access token."));
         }
 
         var userId = principal.FindFirstValue(ClaimTypes.NameIdentifier);
-        if (userId is null) return Error.Failure("Invalid token.");
+        if (userId is null) return Result.Failure<AuthenticationResponse>(Error.Failure("Auth.Failure","Invalid token"));
 
         var user = await _userManager.FindByIdAsync(userId);
         if (user is null || user.RefreshToken != request.RefreshToken || user.RefreshTokenExpiryTime < DateTime.UtcNow)
         {
-            return Error.Failure("Invalid refresh token.");
+            return Result.Failure<AuthenticationResponse>(Error.Failure("Auth.Failure","Invalid refresh token."));
         }
 
         // Generar nuevos tokens
@@ -55,15 +55,16 @@ public class RefreshTokenHandler : IRequestHandler<RefreshTokenRequest, Authenti
         user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
         await _userManager.UpdateAsync(user);
 
-        return new AuthenticationResponse(
+        return Result.Success(new AuthenticationResponse
+        (
             user.Id,
             roles.FirstOrDefault()!,
             user.FullName,
             user.Email!,
             newAccessToken,
             newRefreshToken,
-            DateTime.UtcNow.AddMinutes(15)
-        );
+            DateTime.UtcNow.AddMinutes(15)));
+
     }
 
     private ClaimsPrincipal? GetPrincipalFromExpiredToken(string token)

@@ -2,10 +2,10 @@
 
 namespace UHO_API.Features.Area.Dto;
 
-public record AreaResponse
-(
+public record AreaResponse(
      int Id,
      string Nombre,
-     string? JefeAreaId ,
-     string? JefeAreaNombre
+     string JefeAreaId,
+     string JefeAreaNombre,
+     string JefeAreaEmail
 );

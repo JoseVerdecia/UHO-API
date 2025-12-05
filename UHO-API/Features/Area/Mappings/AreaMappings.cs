@@ -13,7 +13,8 @@ public static class AreaMappings
                 area.Id,
                 area.Nombre, 
                 area.JefeAreaId, 
-                area.JefeArea?.FullName ?? "No Asignado"
+                area.JefeArea?.FullName ?? "No Asignado",
+                area.JefeArea?.Email ?? "N/A"
             
             ));
 
@@ -25,7 +26,8 @@ public static class AreaMappings
             area.Id,
             area.Nombre,
             area.JefeAreaId,
-            area.JefeArea?.FullName ?? "No asignado"
+            area.JefeArea?.FullName ?? "No asignado",
+            area.JefeArea?.Email ?? "N/A"
         );
     }
 

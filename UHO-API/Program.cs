@@ -101,7 +101,7 @@ builder.Services.AddScoped<IRequestHandler<GetUserQuery, ApplicationUser>, GetUs
 builder.Services.AddScoped<IRequestHandler<GetAllUsersQuery, IEnumerable<ApplicationUser>>, GetAllUserQueryHandler>();
 builder.Services.AddScoped<IRequestHandler<GetAllJefeAreasQuery, IEnumerable<ApplicationUser>>, GetAllJefeAreasQueryHandler>();
 builder.Services.AddScoped<IRequestHandler<GetAllUsuariosNormalQuery, IEnumerable<ApplicationUser>>, GetAllUsuariosNormalQueryHandler>();
-builder.Services.AddScoped<IRequestHandler<GetAllJefeProcesos, IEnumerable<ApplicationUser>>, GetAllJefeProcesosQueryHandler>();
+builder.Services.AddScoped<IRequestHandler<GetAllJefeProcesosQuery, IEnumerable<ApplicationUser>>, GetAllJefeProcesosQueryHandler>();
 builder.Services.AddScoped<IRequestHandler<DegradeUserToUsuarioNormalCommand, ApplicationUser>, DegradeUserToUsuarioNormalHandler>();
 
 builder.Services.AddScoped<IUnitOfWorks, UnitOfWorks>();

@@ -11,6 +11,7 @@ namespace UHO_API.Endpoints;
 
 public static class AreaEndpoints
 {
+    
     public static void MapAreaEndpoints(this WebApplication app)
     {
         var areasGroup = app.MapGroup("areas");
@@ -47,10 +48,26 @@ public static class AreaEndpoints
         return result.ToHttpResult();
     }
 
-    private static async Task<IResult> UpdateArea(int id, [FromBody] UpdateAreaCommand command, IMediator mediator)
+    private static async Task<IResult> UpdateArea(int id, [FromBody] UpdateAreaCommand command,[FromServices] IMediator mediator)
     {
         var commandWithId = command with { Id = id };
+        if (string.IsNullOrWhiteSpace(commandWithId.Nombre))
+        {
+            return Results.BadRequest(ApiResponse.CreateFailure(
+                Error.Validation("Nombre", "El nombre del área es requerido")
+            ));
+        }
+    
         var result = await mediator.Send<UpdateAreaCommand, AreaResponse>(commandWithId);
+    
+        if (result.IsSuccess)
+        {
+            return Results.Ok(ApiResponse<AreaResponse>.CreateSuccess(
+                result.Value, 
+                "Área actualizada exitosamente"
+            ));
+        }
+    
         return result.ToHttpResult();
     }
 
@@ -61,16 +78,19 @@ public static class AreaEndpoints
         return result.ToHttpResult();
     }
 
-    private static async Task<IResult> CreateArea([FromBody] CreateAreaCommand command, IMediator mediator)
+    private static async Task<IResult> CreateArea(
+        [FromBody] CreateAreaCommand command,
+        [FromServices] IMediator mediator)
     {
         var result = await mediator.Send<CreateAreaCommand, AreaResponse>(command);
-
-        if (result.IsSuccess)
-        {
-            return Results.CreatedAtRoute("GetAreaById", new { id = result.Value.Id }, result.Value);
-        }
-
-        return result.ToHttpResult();
+        
+        return result.Match(
+            onSuccess: value => Results.Created(
+                $"/areas/{value.Id}", 
+                ApiResponse<AreaResponse>.CreateSuccess(value, "Área creada exitosamente")
+            ),
+            onFailure: error => error.ToHttpResult()
+        );
     }
 
     private static async Task<IResult> GetAreaById(int id, IMediator mediator)
@@ -79,4 +99,6 @@ public static class AreaEndpoints
         var result = await mediator.Send<GetAreaByIdQuery, AreaResponse>(query);
         return result.ToHttpResult();
     }
+    
+    
 }

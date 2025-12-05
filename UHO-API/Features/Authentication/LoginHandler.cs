@@ -7,8 +7,6 @@ using UHO_API.Utilities;
 namespace UHO_API.Features.Authentication;
 
 public record LoginRequest(string Email, string Password) : IRequest<AuthenticationResponse>;
-
-// Features/Authentication/Login/LoginHandler.cs
 public class LoginHandler : IRequestHandler<LoginRequest, AuthenticationResponse>
 {
     private readonly UserManager<ApplicationUser> _userManager;
@@ -24,9 +22,12 @@ public class LoginHandler : IRequestHandler<LoginRequest, AuthenticationResponse
     {
         var user = await _userManager.FindByEmailAsync(request.Email);
         
-        if (user is null || !await _userManager.CheckPasswordAsync(user, request.Password))
+        // Verificar si el usuario existe y no está eliminado
+        if (user is null || user.IsDeleted || !await _userManager.CheckPasswordAsync(user, request.Password))
         {
-            return Error.Validation("Email o contraseña invalidos.");
+            return Result.Failure<AuthenticationResponse>(
+                Error.Validation("Credenciales", "Email o contraseña inválidos")
+            );
         }
 
         // Generar tokens
@@ -37,9 +38,10 @@ public class LoginHandler : IRequestHandler<LoginRequest, AuthenticationResponse
         // Guardar refresh token
         user.RefreshToken = refreshToken;
         user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
+        user.UpdatedAt = DateTime.UtcNow;
         await _userManager.UpdateAsync(user);
 
-        return new AuthenticationResponse(
+        return Result.Success(new AuthenticationResponse(
             user.Id,
             roles.FirstOrDefault()!,
             user.FullName,
@@ -47,6 +49,6 @@ public class LoginHandler : IRequestHandler<LoginRequest, AuthenticationResponse
             accessToken,
             refreshToken,
             DateTime.UtcNow.AddMinutes(15)
-        );
+        ));
     }
 }

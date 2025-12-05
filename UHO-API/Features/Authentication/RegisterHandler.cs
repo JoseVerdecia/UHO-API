@@ -10,7 +10,6 @@ namespace UHO_API.Features.Authentication;
 
 
 public record RegisterRequest(string Email, string Password,string FullName) : IRequest<AuthenticationResponse>;
-
 public class RegisterHandler : IRequestHandler<RegisterRequest, AuthenticationResponse>
 {
     private readonly UserManager<ApplicationUser> _userManager;
@@ -31,30 +30,37 @@ public class RegisterHandler : IRequestHandler<RegisterRequest, AuthenticationRe
         if (!validationResult.IsValid)
         {
             var errors = string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage));
-            return Error.Validation(errors);
+            return Result.Failure<AuthenticationResponse>(
+                Error.Validation("Registro", errors)
+            );
         }
         
         var existingUser = await _userManager.FindByEmailAsync(request.Email);
         
         if (existingUser is not null)
         {
-            return Error.Conflict("El Usuario con este email ya existe");
+            return Result.Failure<AuthenticationResponse>(
+                Error.Conflict("Usuario", "Email", request.Email)
+            );
         }
 
         var user = new ApplicationUser
         {
             Email = request.Email,
             UserName = request.Email,
-            FullName = request.FullName
+            FullName = request.FullName,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
         };
         
         var identityResult = await _userManager.CreateAsync(user, request.Password);
 
-        
         if (!identityResult.Succeeded)
         {
             var errors = string.Join(", ", identityResult.Errors.Select(e => e.Description));
-            return Error.Validation(errors);
+            return Result.Failure<AuthenticationResponse>(
+                Error.Validation("Registro", errors)
+            );
         }
         
         await _userManager.AddToRoleAsync(user, Roles.UsuarioNormal);
@@ -69,14 +75,14 @@ public class RegisterHandler : IRequestHandler<RegisterRequest, AuthenticationRe
         user.RefreshTokenExpiryTime = DateTime.UtcNow.AddDays(7);
         await _userManager.UpdateAsync(user);
 
-        return new AuthenticationResponse(
+        return Result.Success(new AuthenticationResponse(
             user.Id,
             Roles.UsuarioNormal,
             user.FullName,
             user.Email!,
             accessToken,
             refreshToken,
-            DateTime.UtcNow.AddMinutes(15) // O usa la configuración
-        );
+            DateTime.UtcNow.AddMinutes(15)
+        ));
     }
 }

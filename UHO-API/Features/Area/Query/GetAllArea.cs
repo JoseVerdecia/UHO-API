@@ -21,11 +21,10 @@ public class GetAllAreaHandler : IRequestHandler<GetAllAreaQuery, IEnumerable<Ar
     
     public async Task<Result<IEnumerable<AreaResponse>>> Handle(GetAllAreaQuery query, CancellationToken cancellationToken)
     {
-        IEnumerable<AreaModel> allAreas = await _uow.Area.GetAll(includeProperties:"JefeArea");
+        IEnumerable<AreaModel> activeAreas = await _uow.Area.GetActive(includeProperties:"JefeArea");
 
-        var areasResponse = allAreas.MapToAreaResponses();
+        var areasResponse = activeAreas.MapToAreaResponses();
         
-        return Result<IEnumerable<AreaResponse>>.Success(areasResponse);
-
+        return Result.Success(areasResponse);
     }
 }

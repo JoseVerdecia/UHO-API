@@ -11,6 +11,9 @@ public interface IRepository<T> where T : class
     void Delete(T entity);
     void DeleteRange(IEnumerable<T> entities);
     Task SoftDelete(int id);
+    Task<T?> GetActiveById(int id,string includeProperties = null);
+    Task<IEnumerable<T>> GetActive(string includeProperties = null);
+    Task<IEnumerable<T>> GetDeleted(string includeProperties = null);
     Task<IEnumerable<T>> GetPaginatedAsync(int page, int pageSize);
     void Update(T entity);
     
