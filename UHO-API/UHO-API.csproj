@@ -29,6 +29,7 @@
 
     <ItemGroup>
       <Folder Include="Abstraction\" />
+      <Folder Include="Shared\Constants\" />
     </ItemGroup>
 
 </Project>

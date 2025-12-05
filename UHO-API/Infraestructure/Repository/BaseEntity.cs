@@ -1,4 +1,5 @@
-﻿using UHO_API.Interfaces;
+﻿using UHO_API.Core.Interfaces;
+
 
 namespace UHO_API.Infraestructure.Repository;
 

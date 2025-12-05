@@ -1,5 +1,5 @@
-﻿using UHO_API.Interfaces;
-using UHO_API.Utilities;
+﻿using UHO_API.Core.Interfaces;
+using UHO_API.Shared.Results;
 
 namespace UHO_API.Core.Abstractions;
 

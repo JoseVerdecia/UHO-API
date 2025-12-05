@@ -1,7 +1,6 @@
-﻿using UHO_API.Features.Area.Command;
-using UHO_API.Features.Area.Dto;
-using UHO_API.Models;
-
+﻿using UHO_API.Core.Entities;
+using UHO_API.Features.Area.Commands;
+using UHO_API.Features.Area.Dtos;
 namespace UHO_API.Features.Area.Mappings;
 
 public static class AreaMappings

@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using UHO_API.Interfaces;
-using UHO_API.Models;
+using UHO_API.Core.Entities;
 
-namespace UHO_API.Data;
+
+namespace UHO_API.Infraestructure.Data;
 
 public class ApplicationDbContext : IdentityDbContext<ApplicationUser,ApplicationRole,string>
 {

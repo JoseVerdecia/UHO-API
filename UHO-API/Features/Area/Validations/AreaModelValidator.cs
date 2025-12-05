@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
-using UHO_API.Models;
+using UHO_API.Core.Entities;
+
 
 namespace UHO_API.Features.Area.Validations;
 

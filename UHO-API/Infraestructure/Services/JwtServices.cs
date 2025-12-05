@@ -4,8 +4,8 @@ using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using UHO_API.Data.Settings;
-using UHO_API.Models;
+using UHO_API.Core.Entities;
+using UHO_API.Infraestructure.Settings;
 
 namespace UHO_API.Infraestructure.Services;
 

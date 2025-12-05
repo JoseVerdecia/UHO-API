@@ -1,4 +1,4 @@
-﻿namespace UHO_API.Data.Settings;
+﻿namespace UHO_API.Infraestructure.Settings;
 
 public class JwtSettings
 {

@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
-using UHO_API.Data.Settings;
+using UHO_API.Infraestructure.Settings;
 
 namespace UHO_API.Extensions.ConfigurationExtensions;
 

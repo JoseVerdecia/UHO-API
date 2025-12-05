@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.Storage;
-using UHO_API.Data;
-using UHO_API.Interfaces.IRepository;
-using UHO_API.Models;
+using UHO_API.Core.Entities;
+using UHO_API.Core.Interfaces.IRepository;
+using UHO_API.Infraestructure.Data;
+
 
 namespace UHO_API.Infraestructure.Repository;
 

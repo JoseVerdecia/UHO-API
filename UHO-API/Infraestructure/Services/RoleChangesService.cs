@@ -1,8 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using UHO_API.Infraestructure.SD;
-using UHO_API.Interfaces;
-using UHO_API.Models;
-using UHO_API.Utilities;
+using UHO_API.Core.Entities;
+using UHO_API.Core.Enums;
+using UHO_API.Core.Interfaces;
+using UHO_API.Shared.Results;
+
 
 namespace UHO_API.Infraestructure.Services;
 

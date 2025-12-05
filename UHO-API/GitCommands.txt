@@ -1,0 +1,16 @@
+﻿# 1. Asegurarte de que master esté actualizado
+git checkout master
+git pull origin master
+
+# 2. Cambiar a tu rama de características y hacer rebase sobre master
+git checkout resultpatternmejorado
+git rebase master
+
+# (Si hay conflictos, resuélvelos y luego usa git rebase --continue)
+
+# 3. Volver a master y hacer un fast-forward merge
+git checkout master
+git merge resultpatternmejorado
+
+# 4. Subir los cambios a master
+git push origin master

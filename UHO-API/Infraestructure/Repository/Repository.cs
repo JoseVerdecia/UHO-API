@@ -1,8 +1,8 @@
 ﻿using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
-using UHO_API.Data;
-using UHO_API.Interfaces;
-using UHO_API.Interfaces.IRepository;
+using UHO_API.Core.Interfaces;
+using UHO_API.Core.Interfaces.IRepository;
+using UHO_API.Infraestructure.Data;
 
 namespace UHO_API.Infraestructure.Repository;
 

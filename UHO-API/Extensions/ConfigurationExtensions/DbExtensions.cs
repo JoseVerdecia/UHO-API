@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using UHO_API.Data;
+using UHO_API.Infraestructure.Data;
 
 namespace UHO_API.Extensions.ConfigurationExtensions;
 

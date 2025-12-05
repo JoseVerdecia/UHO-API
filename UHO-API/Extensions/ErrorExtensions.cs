@@ -1,6 +1,8 @@
-﻿using UHO_API.Utilities;
+﻿
+using UHO_API.Extensions;
+using UHO_API.Shared.Results;
 
-namespace UHO_API.Extensions;
+namespace UHO_API.Core.Extensions;
 
 public static class ErrorExtensions
 {

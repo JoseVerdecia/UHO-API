@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using UHO_API.Features.Authentication.Queries;
 
 namespace UHO_API.Features.Authentication.Validations;
 
