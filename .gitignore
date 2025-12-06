@@ -1776,6 +1776,10 @@ fabric.properties
 appsettings.json
 appsettings.Development.json
 launchSettings.json
+Properties/launchSettings.json
+UHO-API/Properties/launchSettings.json
+/UHO-API/Properties/launchSettings.json
+
 
 
 
