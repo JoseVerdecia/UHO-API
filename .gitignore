@@ -484,6 +484,7 @@ $RECYCLE.BIN/
 *.swp
 
 
-!/UHO-API/appsettings.json
-!/UHO-API/appsettings.Development.json
-!/UHO-API/Properties/launchSettings.json
+**/appsettings.json
+
+
+appsettings.json
