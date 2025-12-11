@@ -5,12 +5,10 @@ using UHO_API.Infraestructure.Settings;
 
 namespace UHO_API.Extensions.ConfigurationExtensions;
 
-public static class AuthenticationExtension
+public static class AuthJwtExtensions
 {
-    public static void AddAuthenticationConfiguration(this IServiceCollection services, IConfiguration configuration)
+    public static void AddJwtAuthentication(this IServiceCollection services, JwtSettings? settings)
     {
-        var jwtSettings = configuration.GetSection("JwtSettings").Get<JwtSettings>();
-        
         services.AddAuthentication(options =>
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -23,9 +21,9 @@ public static class AuthenticationExtension
                 ValidateAudience = true,
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
-                ValidIssuer = jwtSettings!.Issuer,
-                ValidAudience = jwtSettings!.Audience,
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings!.SecretKey))
+                ValidIssuer = settings!.Issuer,
+                ValidAudience = settings!.Audience,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(settings!.SecretKey))
             };
         });
     }

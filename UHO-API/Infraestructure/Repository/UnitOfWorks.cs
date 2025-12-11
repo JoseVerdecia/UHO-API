@@ -18,11 +18,20 @@ public class UnitOfWorks:IUnitOfWorks
         _context = context;
         _userManager = userManager;
         Area = new AreaRepository(context, userManager);
+        Proceso = new ProcesoRepository(context);
+        Indicador = new IndicadorRepository(context);
+        IndicadorDeArea = new IndicadorDeAreaRepository(context);
+        Objetivo = new ObjetivoRepository(context);
+        
     }
 
 
     public IAreaRepository Area { get; private set; }
-    
+    public IProcesoRepository Proceso { get; }
+    public IObjetivoRepository Objetivo { get; }
+    public IIndicadorDeAreaRepository IndicadorDeArea { get; }
+    public IIndicadorRepository Indicador { get; }
+
     public async Task SaveChangesAsync() => await _context.SaveChangesAsync();
 
     public void SaveChanges() => _context.SaveChanges();

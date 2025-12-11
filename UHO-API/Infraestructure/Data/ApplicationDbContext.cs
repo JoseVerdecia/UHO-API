@@ -12,6 +12,10 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser,Applicatio
         
     }
     public DbSet<AreaModel> Areas { get; set; }
+    public DbSet<IndicadorModel> Indicadores { get; set; }
+    public DbSet<IndicadorDeAreaModel> IndicadoresDeAreas { get; set; }
+    public DbSet<ProcesoModel> Procesos { get; set; }
+    public DbSet<ObjetivoModel> Objetivos { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

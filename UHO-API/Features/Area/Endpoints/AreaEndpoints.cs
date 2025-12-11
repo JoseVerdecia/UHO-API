@@ -22,9 +22,25 @@ public static class AreaEndpoints
         areasGroup.MapGet("/{id:int}",GetAreaById).WithName("GetAreaById");
         areasGroup.MapPost("/create-area", CreateArea).WithName("CreateArea");
         areasGroup.MapGet("/", GetAllAreas).WithName("GetAllAreas");
+        areasGroup.MapGet("/all-delete-areas", GetAllSoftDeletableAreas).WithName("GetAllSoftDeletableAreas");
+        areasGroup.MapGet("/soft-delete-area/{id:int}", GetSoftDeleteArea).WithName("GetSoftDeleteArea");
         areasGroup.MapPut("/{id:int}", UpdateArea).WithName("UpdateArea");
         areasGroup.MapDelete("/soft-delete/{id:int}", SoftDeleteArea).WithName("SoftDeleteArea");
         areasGroup.MapDelete("/hard-delete/{id:int}", HardDeleteArea).WithName("HardDeleteArea");
+    }
+  
+    private static async Task<IResult> GetSoftDeleteArea(int id ,[FromServices] IMediator mediator)
+    {
+        var query = new GetSoftDeleteAreaQuery(id);
+        var result = await mediator.Send<GetSoftDeleteAreaQuery, AreaResponse>(query);
+        return result.ToHttpResult();
+    }
+
+    private static async Task<IResult> GetAllSoftDeletableAreas([FromServices] IMediator mediator)
+    {
+        var query = new GetAllSoftDeleteAreasQuery();
+        var result =  await mediator.Send<GetAllSoftDeleteAreasQuery, IEnumerable<AreaResponse>>(query);
+        return result.ToHttpResult();
     }
 
     private static async Task<IResult> HardDeleteArea(int id , IMediator mediator)

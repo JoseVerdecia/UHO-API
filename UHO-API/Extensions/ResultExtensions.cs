@@ -71,6 +71,37 @@
                 }
             );
         }
+        
+        // Otras
+        public static async Task<Result<T>> BindAsync<T>(
+            this Task<Result> task, Func<Task<Result<T>>> binder)
+        {
+            var result = await task;
+            if (result.IsFailure)
+                return Result.Failure<T>(result.Error);
+            
+            return await binder();
+        }
+        
+        public static async Task<Result<TOut>> BindAsync<TIn, TOut>(
+            this Task<Result<TIn>> task, Func<TIn, Task<Result<TOut>>> binder)
+        {
+            var result = await task;
+            if (result.IsFailure)
+                return Result.Failure<TOut>(result.Error);
+            
+            return await binder(result.Value);
+        }
+        
+        public static async Task<Result> TapAsync<T>(
+            this Task<Result<T>> task, Func<T, Task> action)
+        {
+            var result = await task;
+            if (result.IsSuccess)
+                await action(result.Value);
+            
+            return result;
+        }
     }
 
 
