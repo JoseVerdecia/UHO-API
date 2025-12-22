@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using System.ComponentModel.DataAnnotations;
+using FluentValidation;
+using Microsoft.AspNetCore.Identity;
 using UHO_API.Core.Entities;
 using UHO_API.Core.Interfaces;
 using UHO_API.Core.Interfaces.IRepository;
@@ -14,23 +16,29 @@ public class CreateAreaHandler : IRequestHandler<CreateAreaCommand, AreaResponse
     private readonly IUnitOfWorks _uow;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IRoleChangesService _roleChangesService;
-
-    public CreateAreaHandler(IUnitOfWorks uow, UserManager<ApplicationUser> userManager, IRoleChangesService roleChangesService)
+    private readonly IValidator<CreateAreaCommand> _validator;
+    public CreateAreaHandler(
+        IUnitOfWorks uow,
+        UserManager<ApplicationUser> userManager,
+        IRoleChangesService roleChangesService,
+        IValidator<CreateAreaCommand> validator)
     {
         _uow = uow;
         _userManager = userManager;
         _roleChangesService = roleChangesService;
+        _validator = validator;
     }
 
     public async Task<Result<AreaResponse>> Handle(CreateAreaCommand request, CancellationToken cancellationToken)
     {
-        
-        if (string.IsNullOrWhiteSpace(request.Nombre))
+        var commandValidationResult =  await _validator.ValidateAsync(request);
+
+        if (!commandValidationResult.IsValid)
         {
-            return Result.Failure<AreaResponse>(
-                Error.Validation("Nombre", "El nombre del área es requerido")
-            );
+            var errors = commandValidationResult.Errors.Select(e=> Error.Validation(e.PropertyName, e.ErrorMessage));
+            return Result.Failure<AreaResponse>(errors.ToArray());
         }
+     
         
         var existingArea = await _uow.Area.Get(a => a.Nombre == request.Nombre);
         

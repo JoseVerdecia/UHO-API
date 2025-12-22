@@ -10,7 +10,7 @@ public class ProcesoValidations :AbstractValidator<CreateProcesoCommand>
     public ProcesoValidations()
     {
         RuleFor(x => x.nombre)
-            .NotNull().WithMessage("El nombre del Proceso no puede ser nulo.")
+            .NotNull().WithMessage("El nombre del Proceso es requerido")
             .NotEmpty().WithMessage("El nombre del Proceso no puede estar vacio")
             .MaximumLength(50).WithMessage("El nombre del Proceso no debe ser mayor a 50 caracteres");
     }

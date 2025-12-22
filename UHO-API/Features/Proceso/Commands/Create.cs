@@ -32,12 +32,13 @@ public class CreateProcesoHandler : IRequestHandler<CreateProcesoCommand, Proces
 
         if (!resultValidation.IsValid)
         {
-            var errorMessages = string.Join(", ", resultValidation.Errors.Select(e => e.ErrorMessage));
+            var errors = resultValidation.Errors.Select(e => 
+                Error.Validation(e.PropertyName, e.ErrorMessage));
 
-            return Result.Failure<ProcesoDto>(
-                Error.Validation("Proceso.Invalido", errorMessages) // Puedes usar un código más específico
-            );
+            return Result.Failure<ProcesoDto>(errors.ToArray());
         }
+        
+        
         if (string.IsNullOrWhiteSpace(request.nombre))
         {
             return Result.Failure<ProcesoDto>(

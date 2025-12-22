@@ -62,11 +62,11 @@ public class UpdateIndicadorHandler : IRequestHandler<UpdateIndicadorCommand, In
 
             // Setear metaCumplir
             var r1 = _evaluacionService.SetMetaCumplir(indicador, dto.MetaCumplir);
-            if (r1.IsFailure) return Result.Failure<IndicadorDto>(r1.Error);
+            if (r1.IsFailure) return Result.Failure<IndicadorDto>(r1.Errors);
 
             // Setear metaReal (puede ser null/empty)
             var r2 = _evaluacionService.SetMetaReal(indicador, dto.MetaReal);
-            if (r2.IsFailure) return Result.Failure<IndicadorDto>(r2.Error);
+            if (r2.IsFailure) return Result.Failure<IndicadorDto>(r2.Errors);
 
             _uow.Indicador.Update(indicador);
             await _uow.SaveChangesAsync();

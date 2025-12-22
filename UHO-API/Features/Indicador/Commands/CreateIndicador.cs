@@ -75,13 +75,13 @@ public class CreateIndicadorHandler : IRequestHandler<CreateIndicadorCommand, In
 
      
         var result = _evaluacionService.SetMetaCumplir(indicador, dto.MetaCumplir);
-        if (result.IsFailure) return Result.Failure<IndicadorDto>(result.Error);
+        if (result.IsFailure) return Result.Failure<IndicadorDto>(result.Errors);
 
      
         if (!string.IsNullOrWhiteSpace(dto.MetaReal))
         {
             var r2 = _evaluacionService.SetMetaReal(indicador, dto.MetaReal);
-            if (r2.IsFailure) return Result.Failure<IndicadorDto>(r2.Error);
+            if (r2.IsFailure) return Result.Failure<IndicadorDto>(r2.Errors);
         }
         else
         {

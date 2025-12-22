@@ -31,10 +31,8 @@ public class RegisterHandler : IRequestHandler<RegisterRequest, AuthenticationRe
         
         if (!validationResult.IsValid)
         {
-            var errors = string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage));
-            return Result.Failure<AuthenticationResponse>(
-                Error.Validation("Registro", errors)
-            );
+            var errors = validationResult.Errors.Select(e => Error.Validation(e.PropertyName,e.ErrorMessage));
+            return Result.Failure<AuthenticationResponse>(errors.ToArray());
         }
         
         var existingUser = await _userManager.FindByEmailAsync(request.Email);

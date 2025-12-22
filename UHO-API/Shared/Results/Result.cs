@@ -1,28 +1,38 @@
 ﻿namespace UHO_API.Shared.Results;
 
 
+
 public abstract class Result
 {
     public bool IsSuccess { get; protected init; }
     public bool IsFailure => !IsSuccess;
-    public Error Error { get; protected init; } = Error.None;
+    public IReadOnlyList<Error> Errors { get; protected init; } = Array.Empty<Error>();
+    
+    // Propiedad conveniente para compatibilidad (primer error)
+    public Error FirstError => Errors.FirstOrDefault() ?? Error.None;
     
     protected Result() { }
     
     // Métodos estáticos para éxito
     public static Result Success() => new SuccessResult();
-    public static Result<T> Success<T>(T value) => new (value, true, Error.None);
+    public static Result<T> Success<T>(T value) => new (value, true, Array.Empty<Error>());
     
-    // Métodos estáticos para fallo
-    public static Result Failure(Error error) => new FailureResult(error);
-    public static Result<T> Failure<T>(Error error) => new(default!, false, error);
+    // Métodos estáticos para fallo (mantener compatibilidad con un solo error)
+    public static Result Failure(Error error) => new FailureResult([error]);
+    public static Result<T> Failure<T>(Error error) => new(default!, false, [error]);
+    
+    // Métodos para múltiples errores
+    public static Result Failure(IEnumerable<Error> errors) => new FailureResult(errors.ToList());
+    public static Result<T> Failure<T>(IEnumerable<Error> errors) => new(default!, false, errors.ToList());
+    public static Result Failure(params Error[] errors) => new FailureResult(errors);
+    public static Result<T> Failure<T>(params Error[] errors) => new(default!, false, errors);
     
     
     public TResult Match<TResult>(
         Func<TResult> onSuccess,
-        Func<Error, TResult> onFailure)
+        Func<IReadOnlyList<Error>, TResult> onFailure)
     {
-        return IsSuccess ? onSuccess() : onFailure(Error);
+        return IsSuccess ? onSuccess() : onFailure(Errors);
     }
     
     private sealed class SuccessResult : Result
@@ -32,15 +42,13 @@ public abstract class Result
     
     private sealed class FailureResult : Result
     {
-        public FailureResult(Error error)
+        public FailureResult(IReadOnlyList<Error> errors)
         {
             IsSuccess = false;
-            Error = error;
+            Errors = errors;
         }
     }
-    
 }
-
 
 public sealed class Result<T> : Result
 {
@@ -50,23 +58,33 @@ public sealed class Result<T> : Result
         ? _value! 
         : throw new InvalidOperationException("Cannot access Value of a failed result");
     
-    internal Result(T? value, bool isSuccess, Error error)
+    internal Result(T? value, bool isSuccess, IReadOnlyList<Error> errors)
     {
         _value = value;
         IsSuccess = isSuccess;
-        Error = error;
+        Errors = errors;
     }
+    
+    // Constructor de conveniencia para un solo error
+    internal Result(T? value, bool isSuccess, Error error)
+        : this(value, isSuccess, [error])
+    {
+    }
+    public static new Result<T> Success(T value) => new(value, true, Array.Empty<Error>());
+    public static new Result<T> Failure(Error error) => new(default!, false, [error]);
+    public static new Result<T> Failure(IEnumerable<Error> errors) => new(default!, false, errors.ToList());
+    public static new Result<T> Failure(params Error[] errors) => new(default!, false, errors);
     
     public Result<TResult> Map<TResult>(Func<T, TResult> mapper)
     {
         return IsSuccess 
             ? Result.Success(mapper(_value!))
-            : Result.Failure<TResult>(Error);
+            : Result.Failure<TResult>(Errors);
     }
     
     public Result<TResult> Bind<TResult>(Func<T, Result<TResult>> binder)
     {
-        return IsSuccess ? binder(_value!) : Result.Failure<TResult>(Error);
+        return IsSuccess ? binder(_value!) : Result.Failure<TResult>(Errors);
     }
     
     public Result<T> Tap(Action<T> action)
@@ -90,7 +108,7 @@ public sealed class Result<T> : Result
     // Para operaciones que pueden fallar
     public Result<TResult> Try<TResult>(Func<T, TResult> operation, Func<Exception, Error> errorMapper)
     {
-        if (IsFailure) return Result.Failure<TResult>(Error);
+        if (IsFailure) return Result.Failure<TResult>(Errors);
         
         try
         {
@@ -102,19 +120,37 @@ public sealed class Result<T> : Result
         }
     }
     
-    // Combinar resultados
+    // Combinar resultados con múltiples errores
     public static Result<T> Combine(params Result[] results)
     {
-        var failedResult = results.FirstOrDefault(r => r.IsFailure);
-        return failedResult != null 
-            ? Result.Failure<T>(failedResult.Error)
+        var errors = results
+            .Where(r => r.IsFailure)
+            .SelectMany(r => r.Errors)
+            .ToList();
+        
+        return errors.Any() 
+            ? Result.Failure<T>(errors)
             : Result.Success(default(T)!);
     }
-    public IResult Match(
-        Func<T, IResult> onSuccess,
-        Func<Error, IResult> onFailure)
+    
+    // Método para combinar resultados de diferentes tipos
+    public static Result<T> Combine<T1, T2>(Result<T1> result1, Result<T2> result2)
     {
-        return IsSuccess ? onSuccess(Value) : onFailure(Error);
+        var errors = new List<Error>();
+        
+        if (result1.IsFailure) errors.AddRange(result1.Errors);
+        if (result2.IsFailure) errors.AddRange(result2.Errors);
+        
+        return errors.Any()
+            ? Result.Failure<T>(errors)
+            : Result.Success(default(T)!);
     }
     
+    // Método Match específico para Result<T>
+    public TResult Match<TResult>(
+        Func<T, TResult> onSuccess,
+        Func<IReadOnlyList<Error>, TResult> onFailure)
+    {
+        return IsSuccess ? onSuccess(_value!) : onFailure(Errors);
+    }
 }

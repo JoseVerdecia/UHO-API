@@ -10,7 +10,6 @@ public class ProcesoModel: IEntity,ISoftDeletable
     [Key]
     public int Id { get; set; }
     
-    [Required]
     public string Nombre { get; set; } = string.Empty;
 
     public IEnumerable<IndicadorModel> Indicadores { get; set; } = new List<IndicadorModel>();

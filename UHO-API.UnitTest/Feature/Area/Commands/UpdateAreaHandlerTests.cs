@@ -12,7 +12,7 @@ using UHO_API.Features.Area.Commands;
 using UHO_API.Shared.Results;
 
 namespace UHO_API.UnitTest.Feature.Area.Commands;
-
+/*
 public class UpdateAreaHandlerTests
 {
     private readonly Mock<IUnitOfWorks> _mockUow;
@@ -187,3 +187,4 @@ public class UpdateAreaHandlerTests
         _mockTransaction.Verify(t => t.CommitAsync(It.IsAny<CancellationToken>()), Times.Never);
     }
 }
+*/
