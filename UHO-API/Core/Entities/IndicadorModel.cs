@@ -13,8 +13,7 @@ public class IndicadorModel: IEntity,ISoftDeletable,IEvaluable
     [Required(ErrorMessage = "El nombre del Indicador es Obligatorio")]
     [MaxLength(250, ErrorMessage = "Nombre del Indicador muy largo")]
     public string Nombre { get; set; } = string.Empty;
-        
-    // Propiedades
+    
     
     [Required(ErrorMessage = "La meta a cumplir del Indicador es obligatoria")]
     public string MetaCumplir { get; set; }
@@ -25,9 +24,7 @@ public class IndicadorModel: IEntity,ISoftDeletable,IEvaluable
     public bool IsMetaRealPorcentage { get; set; }
     public EvaluationType Evaluacion { get; set; }
     
-    public string Comentario { get; set; }
-    
-    public string GetEntityIdentifier() => Id.ToString();
+    public string? Comentario { get; set; }
     
     //Relaciones
     [Required(ErrorMessage = "El Indicador debe tener un Proceso asignado")]

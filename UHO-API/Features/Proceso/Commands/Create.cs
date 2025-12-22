@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using FluentValidation;
+using Microsoft.AspNetCore.Identity;
 using UHO_API.Core.Entities;
 using UHO_API.Core.Interfaces;
 using UHO_API.Core.Interfaces.IRepository;
@@ -15,16 +16,28 @@ public class CreateProcesoHandler : IRequestHandler<CreateProcesoCommand, Proces
     private readonly IUnitOfWorks _uow;
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly IRoleChangesService _roleChangesService;
+    private readonly IValidator<CreateProcesoCommand> _validator;
 
-    public CreateProcesoHandler(IUnitOfWorks uow, UserManager<ApplicationUser> userManager, IRoleChangesService roleChangesService)
+    public CreateProcesoHandler(IUnitOfWorks uow, UserManager<ApplicationUser> userManager, IRoleChangesService roleChangesService,IValidator<CreateProcesoCommand> validator)
     {
         _uow = uow;
         _userManager = userManager;
         _roleChangesService = roleChangesService;
+        _validator = validator;
     }
 
     public async Task<Result<ProcesoDto>> Handle(CreateProcesoCommand request, CancellationToken cancellationToken)
     {
+        var resultValidation = await _validator.ValidateAsync(request,cancellationToken);
+
+        if (!resultValidation.IsValid)
+        {
+            var errorMessages = string.Join(", ", resultValidation.Errors.Select(e => e.ErrorMessage));
+
+            return Result.Failure<ProcesoDto>(
+                Error.Validation("Proceso.Invalido", errorMessages) // Puedes usar un código más específico
+            );
+        }
         if (string.IsNullOrWhiteSpace(request.nombre))
         {
             return Result.Failure<ProcesoDto>(

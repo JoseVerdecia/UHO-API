@@ -17,12 +17,12 @@ public static class AreaEndpoints
     
     public static void MapAreaEndpoints(this WebApplication app)
     {
-        var areasGroup = app.MapGroup("areas");
+        var areasGroup = app.MapGroup("areas").WithTags("Areas");
 
         areasGroup.MapGet("/{id:int}",GetAreaById).WithName("GetAreaById");
         areasGroup.MapPost("/create-area", CreateArea).WithName("CreateArea");
         areasGroup.MapGet("/", GetAllAreas).WithName("GetAllAreas");
-        areasGroup.MapGet("/all-delete-areas", GetAllSoftDeletableAreas).WithName("GetAllSoftDeletableAreas");
+        areasGroup.MapGet("/delete-all-areas", GetAllSoftDeletableAreas).WithName("GetAllSoftDeletableAreas");
         areasGroup.MapGet("/soft-delete-area/{id:int}", GetSoftDeleteArea).WithName("GetSoftDeleteArea");
         areasGroup.MapPut("/{id:int}", UpdateArea).WithName("UpdateArea");
         areasGroup.MapDelete("/soft-delete/{id:int}", SoftDeleteArea).WithName("SoftDeleteArea");

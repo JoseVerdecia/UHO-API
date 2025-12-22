@@ -21,7 +21,7 @@ public class GetAllProcesoHandler : IRequestHandler<GetAllProcesoQuery, IEnumera
     
     public async Task<Result<IEnumerable<ProcesoDto>>> Handle(GetAllProcesoQuery query, CancellationToken cancellationToken)
     {
-        IEnumerable<ProcesoModel> activeProcesos = await _uow.Proceso.GetActive(includeProperties:"JefeDeProceso");
+        IEnumerable<ProcesoModel> activeProcesos = await _uow.Proceso.GetAllActive(includeProperties:"JefeDeProceso");
 
         var procesoDto = activeProcesos.MapToProcesosDto();
         

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("UHO-API.UnitTest")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+aa39076256dba26bac20c9e1a4bcb1a206fd02bd")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+463cbd097c133cf4b88407190f3ff217ae50a2be")]
 [assembly: System.Reflection.AssemblyProductAttribute("UHO-API.UnitTest")]
 [assembly: System.Reflection.AssemblyTitleAttribute("UHO-API.UnitTest")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

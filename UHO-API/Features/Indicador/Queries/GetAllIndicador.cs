@@ -16,7 +16,7 @@ public class GetAllIndicadoresHandler : IRequestHandler<GetAllIndicadoresQuery, 
 
     public async Task<Result<IEnumerable<IndicadorDto>>> Handle(GetAllIndicadoresQuery request, CancellationToken cancellationToken)
     {
-        var indicadores = await _uow.Indicador.GetActive(includeProperties: "Proceso,Objetivos,IndicadoresAsignados");
+        var indicadores = await _uow.Indicador.GetAllActive(includeProperties: "Proceso,Objetivos,IndicadoresAsignados");
         var dtos = indicadores.Select(i => i.ToDto());
         return Result.Success(dtos);
     }

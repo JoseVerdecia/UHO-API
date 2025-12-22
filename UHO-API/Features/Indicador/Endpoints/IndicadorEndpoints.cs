@@ -16,7 +16,7 @@ public static class IndicadorEndpoints
 {
     public static void MapIndicadorEndpoints(this WebApplication app)
     {
-        var grp = app.MapGroup("indicadores");
+        var grp = app.MapGroup("indicadores").WithTags("Indicadores");
 
         grp.MapGet("/{id:int}", GetIndicadorById).WithName("GetIndicadorById");
         grp.MapPost("/create", CreateIndicador).WithName("CreateIndicador");

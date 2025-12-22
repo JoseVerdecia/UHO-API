@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Scalar.AspNetCore;
 using UHO_API.Core.Entities;
 using UHO_API.Core.Extensions;
 using UHO_API.Core.Interfaces;
@@ -14,24 +15,29 @@ public static class UserEndpoints
 {
     public static void MapUserEndpoints(this WebApplication app)
     {
-        var userGroup = app.MapGroup("users");
+        var userGroup = app.MapGroup("users").WithTags("Usuarios");
 
-        userGroup.MapGet("/", GetAllUsers);
-        userGroup.MapGet("/{id:Guid}", GetUser);
-        userGroup.MapGet("/users-in-rol-jefeArea", GetJefeAreas);
-        userGroup.MapGet("/users-in-rol-jefeProceso", GetJefeProcesos);
-        userGroup.MapGet("/users-in-rol-usuario-normal", GetUsuariosNormal);
+        userGroup.MapGet("/", GetAllUsers)
+            .WithDescription("Obtiene todos los usuarios");
+        
+        userGroup.MapGet("/{id:Guid}", GetUser)
+            .WithDescription("Obtiene un usuario por su ID");
+        
+        userGroup.MapGet("/users-in-rol-jefeArea", GetJefeAreas)
+            .WithDescription("Obtiene los usuarios con el rol: 'JefeArea'");
+        
+        userGroup.MapGet("/users-in-rol-jefeProceso", GetJefeProcesos)
+            .WithDescription("Obtiene los usuarios con el rol: 'JefeProceso'");
+        
+        userGroup.MapGet("/users-in-rol-usuario-normal", GetUsuariosNormal)
+            .WithDescription("Obtiene los usuarios con el rol: 'UsuarioNormal'");
 
         userGroup.MapPost("/degrade-user/{id:Guid}", DegradeUserToUsuarioNormal)
             .WithName("DegradeUser")
-            .WithTags("Users")
-            .WithSummary("Degrada un usuario a Rol : UsuarioNormal")
             .WithDescription("Quita los roles de 'JefeArea' o 'JefeProceso' a un usuario y le asigna el rol 'UsuarioNormal'.");
     }
 
-    private static async Task<IResult> DegradeUserToUsuarioNormal(
-        string id,
-        [FromServices] IMediator mediator)
+    private static async Task<IResult> DegradeUserToUsuarioNormal(string id,[FromServices] IMediator mediator)
     {
         var command = new DegradeUserToUsuarioNormalCommand(id);
         var result = await mediator.Send<DegradeUserToUsuarioNormalCommand, ApplicationUser>(command);

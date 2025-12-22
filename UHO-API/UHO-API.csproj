@@ -30,7 +30,6 @@
     <ItemGroup>
       <Folder Include="Core\Handlers\" />
       <Folder Include="Features\Indicador\Validations\" />
-      <Folder Include="Features\Proceso\Validations\" />
       <Folder Include="Shared\Constants\" />
     </ItemGroup>
 

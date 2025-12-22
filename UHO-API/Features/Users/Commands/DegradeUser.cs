@@ -40,14 +40,16 @@ public class DegradeUserToUsuarioNormalHandler : IRequestHandler<DegradeUserToUs
         var validationResult = await _validator.ValidateAsync(request, cancellationToken);
         if (!validationResult.IsValid)
         {
-            var errors = validationResult.Errors.Select(e => e.ErrorMessage);
+            IEnumerable<string> errors = validationResult.Errors.Select(e => e.ErrorMessage);
+            
             return Result.Failure<ApplicationUser>(
                 Error.Validation("CommandValidation", string.Join("; ", errors))
             );
         }
 
    
-        var user = await _userManager.FindByIdAsync(request.UserId);
+        ApplicationUser? user = await _userManager.FindByIdAsync(request.UserId);
+        
         if (user is null)
         {
             return Result.Failure<ApplicationUser>(
@@ -71,7 +73,10 @@ public class DegradeUserToUsuarioNormalHandler : IRequestHandler<DegradeUserToUs
             !userRoles.Contains(Roles.JefeProceso))
         {
             _logger.LogInformation("Usuario {UserId} ya tiene rol UsuarioNormal sin roles de jefe", request.UserId);
-            return Result.Success(user);
+            
+            return Result.Failure<ApplicationUser>(
+                Error.Business("IsUsuarioNormal", "No se puede degradar a un usuario con el rol: 'UsuarioNormal' ")
+            );
         }
 
         try
@@ -102,7 +107,7 @@ public class DegradeUserToUsuarioNormalHandler : IRequestHandler<DegradeUserToUs
                     }
                 }
                 
-                // Si es JefeProceso, buscar y desasignar procesos (Implementar mas Adelante cuando haga ProcesoModel)
+                // Si es JefeProceso, buscar y desasignar procesos 
                 
                 var demotionResult = await _roleChangesService.DemoteToUsuarioNormalAsync(request.UserId);
                 if (demotionResult.IsFailure)

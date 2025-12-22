@@ -13,7 +13,7 @@ public static class AuthenticationEndpoints
 {
     public static void MapAuthenticationEndpoints(this WebApplication app)
     {
-        var authGroup = app.MapGroup("auth");
+        var authGroup = app.MapGroup("auth").WithTags("Autenticacion");
 
         authGroup.MapPost("/login", Login);
         authGroup.MapPost("/register", Register);

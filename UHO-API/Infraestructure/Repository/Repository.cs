@@ -96,11 +96,17 @@ public class Repository<T>:IRepository<T> where T:class,IEntity,ISoftDeletable
         return await query.FirstOrDefaultAsync(e => e.Id == id && !e.IsDeleted);
     }
     
-    public async Task<IEnumerable<T>> GetActive(string includeProperties = null)
+    public async Task<IEnumerable<T>> GetAllActive(string includeProperties = null)
     {
         IQueryable<T> query = dbSet.Where(e => !e.IsDeleted);
         query = IncludeProperties(query, includeProperties);
         return await query.ToListAsync();
+    }
+    public async Task<T> GetActiveBy(Expression<Func<T,bool>> predicate , string includeProperties = null)
+    {
+        IQueryable<T> query = dbSet.Where(predicate).Where(e => !e.IsDeleted);
+        query = IncludeProperties(query, includeProperties);
+        return await query.FirstOrDefaultAsync();
     }
     
     public async Task<IEnumerable<T>> GetDeleted(string includeProperties = null)

@@ -23,9 +23,7 @@ public class IndicadorDeAreaModel :IEntity,ISoftDeletable,IEvaluable
     public string MetaReal { get; set; } = string.Empty;
     public decimal DecimalMetaReal { get; set; } = 0;
     public bool IsMetaRealPorcentage { get; set; } = false;
-    public string Comentario { get; set; } = string.Empty;
-    public string GetEntityIdentifier() => $"{IndicadorId}-{AreaId}";
-
+    
     public EvaluationType Evaluacion { get; set; } = EvaluationType.NoEvaluado;
 
     // Relaciones

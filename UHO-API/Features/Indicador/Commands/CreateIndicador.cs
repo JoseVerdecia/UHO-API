@@ -41,20 +41,23 @@ public class CreateIndicadorHandler : IRequestHandler<CreateIndicadorCommand, In
 
       
         var proceso = await _uow.Proceso.Get(p => p.Id == dto.ProcesoId);
+        
         if (proceso is null)
             return Result.Failure<IndicadorDto>(Error.NotFound("Proceso", dto.ProcesoId.ToString()));
 
        
         var objetivos = new List<ObjetivoModel>();
+        
         foreach (var id in dto.ObjetivoIds.Distinct())
         {
             var objetivo = await _uow.Objetivo.Get(o => o.Id == id);
+            
             if (objetivo is null)
                 return Result.Failure<IndicadorDto>(Error.NotFound("Objetivo", id.ToString()));
             objetivos.Add(objetivo);
         }
 
-        var now = DateTime.UtcNow;
+        DateTime now = DateTime.UtcNow;
         
         var indicador = new IndicadorModel
         {
@@ -71,8 +74,8 @@ public class CreateIndicadorHandler : IRequestHandler<CreateIndicadorCommand, In
         };
 
      
-        var r1 = _evaluacionService.SetMetaCumplir(indicador, dto.MetaCumplir);
-        if (r1.IsFailure) return Result.Failure<IndicadorDto>(r1.Error);
+        var result = _evaluacionService.SetMetaCumplir(indicador, dto.MetaCumplir);
+        if (result.IsFailure) return Result.Failure<IndicadorDto>(result.Error);
 
      
         if (!string.IsNullOrWhiteSpace(dto.MetaReal))

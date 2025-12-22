@@ -15,7 +15,8 @@ public static class ProcesoEndpoints
 {
     public static void MapProcesoEndpoints(this WebApplication app)
     {
-        var procesoGroup = app.MapGroup("procesos");
+        var procesoGroup = app.MapGroup("procesos").WithTags("Procesos");
+        
         procesoGroup.MapGet("/{id:int}",GetProcesoById).WithName("GetProcesoById");
         procesoGroup.MapPost("/create-proceso", CreateProceso).WithName("CreateProceso");
         procesoGroup.MapGet("/", GetAllProcesos).WithName("GetAllProcesos");
@@ -62,7 +63,8 @@ public static class ProcesoEndpoints
 
     private static async Task<IResult> UpdateProceso(int id, [FromBody] UpdateProcesoCommand command,[FromServices] IMediator mediator)
     {
-        var commandWithId = command with { Id = id };
+        UpdateProcesoCommand commandWithId = command with { Id = id };
+        
         if (string.IsNullOrWhiteSpace(commandWithId.Nombre))
         {
             return Results.BadRequest(ApiResponse.CreateFailure(
@@ -76,7 +78,7 @@ public static class ProcesoEndpoints
         {
             return Results.Ok(ApiResponse<ProcesoDto>.CreateSuccess(
                 result.Value, 
-                "Proceso actualizada exitosamente"
+                "Proceso actualizado exitosamente"
             ));
         }
     
@@ -98,8 +100,8 @@ public static class ProcesoEndpoints
         
         return result.Match(
             onSuccess: value => Results.Created(
-                $"/Procesos/{value.Id}", 
-                ApiResponse<ProcesoDto>.CreateSuccess(value, "Proceso creada exitosamente")
+                $"/procesos/{value.Id}", 
+                ApiResponse<ProcesoDto>.CreateSuccess(value, "Proceso creado exitosamente")
             ),
             onFailure: error => error.ToHttpResult()
         );

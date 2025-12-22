@@ -20,7 +20,7 @@ public class GetAreaByIdHandler : IRequestHandler<GetAreaByIdQuery, AreaResponse
     public async Task<Result<AreaResponse>> Handle(GetAreaByIdQuery query, CancellationToken cancellationToken)
     {
         // TODO: En vez de utilizar Get , debo utilizar GetActiveById para las Areas no SoftEliminadas
-        var area = await _uow.Area.Get(q=>q.Id == query.Id,includeProperties:"JefeArea");
+        var area = await _uow.Area.GetActiveBy(q=>q.Id == query.Id,includeProperties:"JefeArea");
         
         if (area is null)
         {

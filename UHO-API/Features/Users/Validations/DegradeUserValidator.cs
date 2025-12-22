@@ -8,6 +8,6 @@ public class DegradeUserValidator : AbstractValidator<DegradeUserToUsuarioNormal
     public DegradeUserValidator()
     {
         RuleFor(x => x.UserId)
-            .NotEmpty().WithMessage("El ID de usuario es requerido.");
+            .NotEmpty().NotNull().WithMessage("El ID de usuario es requerido.");
     }
 }

@@ -63,9 +63,9 @@ builder.Services.AddUserCommandsConfiguration();
         // INDICADORES  Commands and Queries 
 
 // Queries
-builder.Services.AddAreaQueriesConfiguration();
+builder.Services.AddIndicadorCommandsConfiguration();
 // Commands
-builder.Services.AddAreaCommandsConfiguration();
+builder.Services.AddIndicadorQueriesConfiguration();
 
 
         // PROCESOS Commands and Queries
@@ -120,7 +120,11 @@ app.Lifetime.ApplicationStarted.Register(() =>
     var urls = app.Urls;
     foreach (var url in urls)
     {
-        Console.WriteLine($"Scalar UI -> {url}/scalar");
+        if (url.Contains("https"))
+        {
+            Console.WriteLine($"Scalar UI -> {url}/scalar");
+        }
+     
     }
 });
 
